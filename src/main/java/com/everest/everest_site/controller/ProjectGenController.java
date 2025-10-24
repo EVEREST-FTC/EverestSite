@@ -14,4 +14,8 @@ public class ProjectGenController {
     public ResponseEntity<String> homepage() {
         return  ResponseEntity.ok("Aqui está o gerador de codigos");
     }
+    @GetMapping("/admin")
+    public ResponseEntity<String> adminPage() {
+        return ResponseEntity.ok("Pagina dos admins");
+    }
 }

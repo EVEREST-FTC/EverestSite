@@ -14,5 +14,9 @@ public class NotionDashController {
     public ResponseEntity<String> homepage() {
         return  ResponseEntity.ok("Aqui está a página do notion");
     }
+    @GetMapping("/admin")
+    public ResponseEntity<String> adminPage() {
+        return ResponseEntity.ok("Pagina dos admins");
+    }
 
 }

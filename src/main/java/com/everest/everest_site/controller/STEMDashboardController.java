@@ -14,4 +14,8 @@ public class STEMDashboardController {
     public ResponseEntity<String> homepage() {
         return  ResponseEntity.ok("Aqui está o stem dashboard");
     }
+    @GetMapping("/admin")
+    public ResponseEntity<String> adminPage() {
+        return ResponseEntity.ok("Pagina dos admins");
+    }
 }

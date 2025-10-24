@@ -1,5 +1,6 @@
 package com.everest.everest_site.infra.security;
 
+import com.everest.everest_site.domain.user.RoleName;
 import com.everest.everest_site.repository.UserRepository;
 import org.apache.catalina.users.AbstractUser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
                         .requestMatchers(HttpMethod.GET, "/homepage").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/notion-dash/admin").hasRole(RoleName.USER_ADIM.toString())
+                        .requestMatchers(HttpMethod.GET, "/project-gen/admin").hasRole(RoleName.USER_ADIM.toString())
+                        .requestMatchers(HttpMethod.GET, "/stem-dash/admin").hasRole(RoleName.USER_ADIM.toString())
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
