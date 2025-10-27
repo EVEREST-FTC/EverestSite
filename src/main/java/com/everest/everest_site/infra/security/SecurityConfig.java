@@ -1,14 +1,13 @@
 package com.everest.everest_site.infra.security;
 
-import com.everest.everest_site.domain.user.RoleName;
-import com.everest.everest_site.repository.UserRepository;
-import org.apache.catalina.users.AbstractUser;
+import com.everest.everest_site.domain.user.roles.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -17,10 +16,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.stereotype.Component;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
     @Autowired
     private CustomUserDetailsService userDetailsService;
@@ -36,10 +35,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize->authorize
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/homepage").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/notion-dash/admin").hasRole(RoleName.USER_ADIM.toString())
-                        .requestMatchers(HttpMethod.GET, "/project-gen/admin").hasRole(RoleName.USER_ADIM.toString())
-                        .requestMatchers(HttpMethod.GET, "/stem-dash/admin").hasRole(RoleName.USER_ADIM.toString())
+                        .requestMatchers("/homepage").permitAll()
+                       /* .requestMatchers("/admin").hasRole(Role.ADMIN.name())
+                        .requestMatchers("/user").hasRole(Role.USER.name())
+                        .requestMatchers( "/manager").hasRole(Role.MANAGER.name())*/
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);

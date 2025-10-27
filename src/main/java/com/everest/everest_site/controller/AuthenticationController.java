@@ -7,6 +7,7 @@ import com.everest.everest_site.dto.auth.RegisterRequest;
 import com.everest.everest_site.dto.auth.RegisterResponse;
 import com.everest.everest_site.infra.security.TokenService;
 import com.everest.everest_site.repository.UserRepository;
+import com.everest.everest_site.service.AuthenticationService;
 import jakarta.servlet.Registration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,35 +25,19 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthenticationController{
 
-    private final UserRepository userRepository;
-    private final TokenService tokenService;
-    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationService authenticationService;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest login){
-        User user = this.userRepository.findByEmail(login.email())
-                .orElseThrow(()->new RuntimeException("User not found"));
-        if(!passwordEncoder.matches(login.password(), user.getPassword()))
-            return  ResponseEntity.badRequest().build();
-
-        String token = tokenService.generateToken(user);
-        return ResponseEntity.ok(new LoginResponse(login.email(),token));
+       Optional<LoginResponse> loginResponse = authenticationService.login(login);
+        return loginResponse.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.badRequest().build());
     }
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest registration){
-        Optional<User> verifyUser = this.userRepository.findByEmail(registration.email());
-        if(verifyUser.isPresent())
-            return ResponseEntity.badRequest().build();
-        User user = User.builder()
-                .password(passwordEncoder.encode(registration.password()))
-                .email(registration.email())
-                .username(registration.name())
-                .build();
-
-        this.userRepository.save(user);
-
-        String token = tokenService.generateToken(user);
-        return ResponseEntity.ok(new RegisterResponse(user.getUsername(),token));
+        Optional<RegisterResponse> registerResponse = authenticationService.register(registration);
+        return registerResponse.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 }
 
