@@ -28,10 +28,6 @@ public enum Role {
     MANAGER
             (
                     Set.of(
-                            Authorities.ADMIN_MANAGE,
-                            Authorities.ADMIN_WRITE,
-                            Authorities.ADMIN_DELETE,
-                            Authorities.ADMIN_READ,
                             Authorities.MANAGER_MANAGE,
                             Authorities.MANAGER_WRITE,
                             Authorities.MANAGER_DELETE,

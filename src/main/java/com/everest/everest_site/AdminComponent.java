@@ -1,5 +1,6 @@
 package com.everest.everest_site;
 
+import com.everest.everest_site.domain.user.roles.Role;
 import com.everest.everest_site.dto.auth.RegisterRequest;
 import com.everest.everest_site.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +18,9 @@ public class AdminComponent {
     @Bean
     public CommandLineRunner initAdmin(AuthenticationService authentication) {
         return args ->
-            authentication.registerAdmin(
-                    new RegisterRequest("admin", adminEmail, adminPassword)
+            authentication.register(
+                    new RegisterRequest("admin", adminEmail, adminPassword),
+                    Role.ADMIN
             );
 
     }

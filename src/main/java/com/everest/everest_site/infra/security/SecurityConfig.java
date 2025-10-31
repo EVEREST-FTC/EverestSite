@@ -36,9 +36,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
                         .requestMatchers("/homepage").permitAll()
-                       /* .requestMatchers("/admin").hasRole(Role.ADMIN.name())
-                        .requestMatchers("/user").hasRole(Role.USER.name())
-                        .requestMatchers( "/manager").hasRole(Role.MANAGER.name())*/
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
