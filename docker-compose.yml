@@ -1,0 +1,30 @@
+services:
+  eureka-server:
+    container_name: everest-eureka
+    build:
+      context: ./everest-site-eureka
+      dockerfile: Dockerfile
+    ports:
+      - "8761:8761"
+    env_file: .env
+  auth-service:
+    container_name: everest-auth
+    build:
+      context: ./EverestSite
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    env_file: .env
+    depends_on:
+      - eureka-server
+  gateway:
+    container_name: everest-gateway
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    env_file: .env
+    depends_on:
+      - eureka-server
+      - auth-service
