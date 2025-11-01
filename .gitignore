@@ -1,6 +1,6 @@
 # Default ignored files
 /shelf/
-/workspace.xml
+/.idea/workspace.xml
 # Editor-based HTTP Client requests
 /httpRequests/
 HELP.md
@@ -34,6 +34,6 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+.env
 ### VS Code ###
 .vscode/
-.env
