@@ -11,5 +11,6 @@ COPY --from=build /app/target/*.jar app.jar
 ARG ALGORITHM_SECRET
 ARG ADMIN_EMAIL
 ARG ADMIN_PASSWORD
+ARG AUTH_ID
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
