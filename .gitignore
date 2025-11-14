@@ -32,5 +32,3 @@ build/
 ### VS Code ###
 .vscode/
 .env
-Dockerfile
-src/main/resources/application.properties
