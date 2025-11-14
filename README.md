@@ -27,11 +27,11 @@ metas e outras funcionalidades analíticas que podem ser implementadas no futuro
 
 | Cor | Método HTTP | Ação |
 | :--- | :--- | :--- |
-| <span style="color: green;">Verde</span> | **POST** | Criação de recurso. |
-| <span style="color: blue;">Azul</span> | **GET** | Leitura/Busca de recurso(s). |
-| <span style="color: yellow;">Amarelo</span> | **PATCH** | Alteração parcial de recurso. |
-| <span style="color: orange;">Laranja</span> | **PUT** | Alteração total (substituição) de recurso. |
-| <span style="color: red;">Vermelho</span> | **DELETE** | Exclusão de recurso. |
+| 🟢 **Verde** | **POST** | Criação de recurso. |
+| 🔵 **Azul** | **GET** | Leitura/Busca de recurso(s). |
+| 🟡 **Amarelo** | **PATCH** | Alteração parcial de recurso. |
+| 🟠 **Laranja** | **PUT** | Alteração total (substituição) de recurso. |
+| 🔴 **Vermelho** | **DELETE** | Exclusão de recurso. |
 
 ---
 ### 2.2 Permissões:
@@ -44,65 +44,65 @@ metas e outras funcionalidades analíticas que podem ser implementadas no futuro
 ## 3 Funcionalidades:
 ### 3.1. Autenticação e Registro (Permissão: NONE)
 
-| Endpoint                                                                        | Descrição |
-|:--------------------------------------------------------------------------------| :--- |
-| <span style="color: green">/auth/admin</span>                                  | Registra novos managers. |
-| <span style="color: green">/auth/user/login</span>                             | Realiza o login de um usuário existente. |
-| <span style="color: green">/auth/user/register</span>                             | Cria uma nova conta de usuário. |
+| Endpoint | Descrição |
+|:---| :--- |
+| 🟢 `/auth/admin` | Registra novos managers. |
+| 🟢 `/auth/user/login` | Realiza o login de um usuário existente. |
+| 🟢 `/auth/user/register` | Cria uma nova conta de usuário. |
 
 ### 3.2. Informações e Gerenciamento de Usuário (Permissão: U, A, M)
 
-| Endpoint                                                        | Descrição                                                      |
-|:----------------------------------------------------------------|:---------------------------------------------------------------|
-| <span style="color: blue;">/user</span>      | Lê as informações do usuário logado.                           |
-| <span style="color: red;">/user</span>    | Deleta a conta do usuário logado.                              |
-| <span style="color: orange;">/user</span> | Atualiza **totalmente** as informações do usuário.             |
-| <span style="color: yellow">/user</span> | Atualiza **parcialmente** as informações do usuário. |
+| Endpoint | Descrição |
+|:---|:---|
+| 🔵 `/user` | Lê as informações do usuário logado. |
+| 🔴 `/user` | Deleta a conta do usuário logado. |
+| 🟠 `/user` | Atualiza **totalmente** as informações do usuário. |
+| 🟡 `/user` | Atualiza **parcialmente** as informações do usuário. |
 
 ### 3.3. Funcionalidades STEM - Materiais
 
 #### Gerenciamento de Materiais (Permissão: A, M)
 
-| Endpoint                                 | Descrição |
-|:-----------------------------------------| :--- |
-| <span style="color: green;">/stem/material/management</span> | Realiza o upload de um PDF de STEM para o AWS S3. |
+| Endpoint | Descrição |
+|:---| :--- |
+| 🟢 `/stem/material/management` | Realiza o upload de um PDF de STEM para o AWS S3. |
 
 #### Leitura de Materiais (Permissão: U)
-| Endpoint                                                        | Descrição |
-|:----------------------------------------------------------------| :--- |
-| <span style="color: blue;">/stem/material/user</span>           | Lista os links de todos os materiais disponíveis no AWS. |
-| <span style="color: blue;">/stem/material/user/{filekey}</span> | Retorna o link para download de um arquivo específico. |
+| Endpoint | Descrição |
+|:---| :--- |
+| 🔵 `/stem/material/user` | Lista os links de todos os materiais disponíveis no AWS. |
+| 🔵 `/stem/material/user/{filekey}` | Retorna o link para download de um arquivo específico. |
 
 ### 3.4. Funcionalidades STEM - Projetos
 
 #### Gerenciamento de Projetos (Permissão: A, M)
 
-| Endpoint                                                                                                                  | Descrição |
-|:--------------------------------------------------------------------------------------------------------------------------| :--- |
-| <span style="color: blue;">/stem/admin/projects</span>                                                                    | Lista todos os projetos feitos por todas as equipes. |
-| <span style="color: blue;">/stem/admin/projects/project/{userId}</span>                                                   | Lista os projetos de um usuário específico. |
-| <span style="color: red;">/stem/material/management</span>                                                                | Deleta um projeto específico de um usuário. |
+| Endpoint | Descrição |
+|:---| :--- |
+| 🔵 `/stem/admin/projects` | Lista todos os projetos feitos por todas as equipes. |
+| 🔵 `/stem/admin/projects/project/{userId}` | Lista os projetos de um usuário específico. |
+| 🔴 `/stem/material/management` | Deleta um projeto específico de um usuário. |
 
 #### Projetos do Usuário (Permissão: U)
 
-| Endpoint                                                                                                        | Descrição |
-|:----------------------------------------------------------------------------------------------------------------| :--- |
-| <span style="color: blue;">/stem/users/projects</span>                                                          | Lê as informações de todos os projetos do usuário logado. |
-| <span style="color: green;">/stem/users/projects</span>                                                         | Cria um novo projeto para o usuário logado. |
-| <span style="color: red;">/stem/users/projects/{projectName}</span>                                             | Deleta um projeto do usuário pelo seu nome. |
-| <span style="color: yellow;">/stem/users/projects/{projectName}</span>                                          | Altera **parcialmente** um projeto do usuário. |
-| <span style="color: orange;">/stem/users/projects/{projectName}</span>                                                   | Altera **totalmente** (substitui) um projeto do usuário. |
+| Endpoint | Descrição |
+|:---| :--- |
+| 🔵 `/stem/users/projects` | Lê as informações de todos os projetos do usuário logado. |
+| 🟢 `/stem/users/projects` | Cria um novo projeto para o usuário logado. |
+| 🔴 `/stem/users/projects/{projectName}` | Deleta um projeto do usuário pelo seu nome. |
+| 🟡 `/stem/users/projects/{projectName}` | Altera **parcialmente** um projeto do usuário. |
+| 🟠 `/stem/users/projects/{projectName}` | Altera **totalmente** (substitui) um projeto do usuário. |
 
 ### 4. Tarefas
 #### 4.1 Feitas
-- Autenticação
-- Upar PDFs pro AWS
-- Diferenciar os ADMIN/USERS/Managers
-- Alterar informações dos usuários
-- Criar, ler, deletar, put e patch dos projetos
+- [x] Autenticação
+- [x] Upar PDFs pro AWS
+- [x] Diferenciar os ADMIN/USERS/Managers
+- [x] Alterar informações dos usuários
+- [x] Criar, ler, deletar, put e patch dos projetos
 #### 4.2 Pendentes
-Fazer download dos materiais
-- Colocar os materiais de stem
-- Criar o campo de metas dos projetos -> Automatizar com microsserviços
-- Criar o gerador de projetos
-- Aprender a hospedar o site
+- [ ] Fazer download dos materiais
+- [ ] Colocar os materiais de stem
+- [ ] Criar o campo de metas dos projetos -> Automatizar com microsserviços
+- [ ] Criar o gerador de projetos
+- [ ] Aprender a hospedar o site
