@@ -46,18 +46,18 @@ metas e outras funcionalidades analíticas que podem ser implementadas no futuro
 
 | Endpoint                                                                        | Descrição |
 |:--------------------------------------------------------------------------------| :--- |
-         | <span style="color: green;">/auth/admin</span>                                  | Registra novos managers. |
-              | <span style="color: green;">/auth/user/login</span>                             | Realiza o login de um usuário existente. |
-                   | <span style="color: green;">/auth/user/register</span>                             | Cria uma nova conta de usuário. |
+| <span style="color: green">/auth/admin</span>                                  | Registra novos managers. |
+| <span style="color: green">/auth/user/login</span>                             | Realiza o login de um usuário existente. |
+| <span style="color: green">/auth/user/register</span>                             | Cria uma nova conta de usuário. |
 
 ### 3.2. Informações e Gerenciamento de Usuário (Permissão: U, A, M)
 
 | Endpoint                                                        | Descrição                                                      |
 |:----------------------------------------------------------------|:---------------------------------------------------------------|
-           | <span style="color: blue;">/user</span>      | Lê as informações do usuário logado.                           |
-                                              | <span style="color: red;">/user</span>    | Deleta a conta do usuário logado.                              |
-                                                 | <span style="color: orange;">/user</span> | Atualiza **totalmente** as informações do usuário.             |
-                                                  | <span style="color: yellow">/user</span> | Atualiza **parcialmente** as informações do usuário. |
+| <span style="color: blue;">/user</span>      | Lê as informações do usuário logado.                           |
+| <span style="color: red;">/user</span>    | Deleta a conta do usuário logado.                              |
+| <span style="color: orange;">/user</span> | Atualiza **totalmente** as informações do usuário.             |
+| <span style="color: yellow">/user</span> | Atualiza **parcialmente** as informações do usuário. |
 
 ### 3.3. Funcionalidades STEM - Materiais
 
@@ -65,7 +65,7 @@ metas e outras funcionalidades analíticas que podem ser implementadas no futuro
 
 | Endpoint                                 | Descrição |
 |:-----------------------------------------| :--- |
-       | <span style="color: green;">/stem/material/management</span> | Realiza o upload de um PDF de STEM para o AWS S3. |
+| <span style="color: green;">/stem/material/management</span> | Realiza o upload de um PDF de STEM para o AWS S3. |
 
 #### Leitura de Materiais (Permissão: U)
 | Endpoint                                                        | Descrição |
