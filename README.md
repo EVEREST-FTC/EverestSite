@@ -95,6 +95,14 @@ metas e outras funcionalidades analíticas que podem ser implementadas no futuro
 
 ### 4. Tarefas
 #### 4.1 Feitas
-
+- Autenticação
+- Upar PDFs pro AWS
+- Diferenciar os ADMIN/USERS/Managers
+- Alterar informações dos usuários
+- Criar, ler, deletar, put e patch dos projetos
 #### 4.2 Pendentes
-
+Fazer download dos materiais
+- Colocar os materiais de stem
+- Criar o campo de metas dos projetos -> Automatizar com microsserviços
+- Criar o gerador de projetos
+- Aprender a hospedar o site
