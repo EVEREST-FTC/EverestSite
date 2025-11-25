@@ -10,34 +10,31 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/stem/admin")
+@RequestMapping("/stem/admin/projects")
 @PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
 public class STEMAdminController {
     private final ProjectService projectService;
 
-    @GetMapping("/projects")
+    @GetMapping
     public ResponseEntity<Set<ProjectRequest>> getAllProjects() {
         return ResponseEntity.ok(projectService.findAll());
     }
 
-    @GetMapping("/project/{userId}")
+    @GetMapping("/{userId}")
     public ResponseEntity<Set<ProjectRequest>> getUserProjects(@PathVariable("userId") String userId) {
 
        return ResponseEntity.ok(projectService.findAll(userId));
 
     }
 
-    @DeleteMapping("/project/{userId}/{projectName}")
+    @DeleteMapping("/{userId}/{projectName}")
     public ResponseEntity<String> deleteUserProject(
             @PathVariable("userId") String userId,
             @PathVariable("projectName") String projectName
     ) {
-        boolean canDelete = projectService.deleteProject(userId, projectName);
-        if (canDelete)
-            return ResponseEntity.ok("Project deleted successfully");
-        else
-            return ResponseEntity.notFound().build();
+        projectService.deleteProject(userId, projectName);
+        return ResponseEntity.ok("Project deleted successfully");
     }
 
 }

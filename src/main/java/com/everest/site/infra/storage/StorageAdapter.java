@@ -99,12 +99,7 @@ public class StorageAdapter implements StoragePort<String> {
         ListObjectsV2Response response = s3Client.listObjectsV2(listRequest);
 
         return response.contents().stream()
-                .map(s3Object -> {
-
-                    String key = s3Object.key();
-                    return String.format("https://%s.s3.%s.amazonaws.com/%s",
-                            this.bucketName, this.region, key);
-                })
+                .map(S3Object::key)
                 .collect(Collectors.toList());
     }
 

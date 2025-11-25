@@ -3,6 +3,7 @@ package com.everest.site.service.info;
 import com.everest.site.domain.dto.users.RegisterRequest;
 import com.everest.site.domain.dto.users.info.UserResponse;
 import com.everest.site.domain.entity.auth.User;
+import com.everest.site.domain.exception.auth.EmailNotFound;
 import com.everest.site.infra.auth.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -21,16 +22,13 @@ public class UserDataService {
     private final PasswordEncoder passwordEncoder;
 
     public void deleteUser(String email) {
-        Optional<User> user = userRepository.findByEmail(email);
-        if(user.isEmpty()) return;
-        userRepository.delete(user.get());
+        User userToDelete = verifyUser(email);
+        userRepository.delete(userToDelete);
     }
 
     @Transactional
     public Optional<UserResponse> updateUser(String lastEmail, RegisterRequest registerRequest) {
-        Optional<User> userOptional = userRepository.findByEmail(lastEmail);
-        if(userOptional.isEmpty()) return Optional.empty();
-        User user = userOptional.get();
+        User user = verifyUser(lastEmail);
 
         user.setPassword(passwordEncoder.encode(registerRequest.password()));
         user.setEmail(registerRequest.email());
@@ -46,11 +44,8 @@ public class UserDataService {
 
     @Transactional
     public Optional<UserResponse> patchUser(String email, Map<String, Object> fields){
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        //lançar exceção
-        if(userOptional.isEmpty()) return  Optional.empty();
 
-        User user = userOptional.get();
+        User user = verifyUser(email);
         merge(fields, user);
 
         userRepository.save(user);
@@ -72,14 +67,18 @@ public class UserDataService {
     }
 
     public Optional<UserResponse> getUser(String email) {
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        if(userOptional.isEmpty()) return Optional.empty();
-        User user = userOptional.get();
+        User user = verifyUser(email);
         return Optional.of(new UserResponse(
                 user.getUsername(),
                 user.getEmail(),
                 user.getRole(),
                 user.getId()
         ));
+    }
+
+    private User verifyUser(String email) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if(userOptional.isEmpty()) throw new  EmailNotFound(email);
+        return userOptional.get();
     }
 }

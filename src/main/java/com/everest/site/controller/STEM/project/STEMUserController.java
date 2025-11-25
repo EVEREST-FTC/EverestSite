@@ -15,12 +15,12 @@ import java.util.Optional;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/stem/users")
+@RequestMapping("/stem/users/projects")
 @RequiredArgsConstructor
 public class STEMUserController {
     private final ProjectService projectService;
 
-    @GetMapping("/projects")
+    @GetMapping
     @PreAuthorize("hasAuthority('user::read')")
     public ResponseEntity<Set<ProjectRequest>> getProjects(@AuthenticationPrincipal User user) {
         String userEmail = user.getEmail();
@@ -28,7 +28,7 @@ public class STEMUserController {
         return ResponseEntity.ok(projects);
     }
 
-    @PostMapping("/projects")
+    @PostMapping
     @PreAuthorize("hasAuthority('user::write')")
     public ResponseEntity<ProjectResponse> createProject(@RequestBody ProjectRequest projectDTO,
                                                          @AuthenticationPrincipal User user) {
@@ -38,20 +38,17 @@ public class STEMUserController {
                 .orElseGet(ResponseEntity.notFound()::build);
     }
 
-    @DeleteMapping("/projects/{projectName}")
+    @DeleteMapping("/{projectName}")
     @PreAuthorize("hasAuthority('user::delete')")
     public ResponseEntity<String> deleteProject(@PathVariable String projectName,
                                                 @AuthenticationPrincipal User user) {
         String userEmail = user.getEmail();
 
-        boolean deleteProject = projectService.deleteProject(projectName, userEmail);
-        if(deleteProject)
-            return ResponseEntity.ok().build();
-
-        return ResponseEntity.notFound().build();
+        projectService.deleteProject(projectName, userEmail);
+        return ResponseEntity.ok().build();
     }
 
-    @PutMapping("/projects/{projectName}")
+    @PutMapping("/{projectName}")
     @PreAuthorize("hasAuthority('user::write')")
     public ResponseEntity<ProjectResponse> updateProject(
             @PathVariable String projectName,
@@ -65,7 +62,7 @@ public class STEMUserController {
                 .orElseGet(ResponseEntity.notFound()::build);
     }
 
-    @PatchMapping("/projects/{projectName}")
+    @PatchMapping("/{projectName}")
     @PreAuthorize("hasAuthority('user::write')")
     public void patchProject(
                                                         @RequestBody Map<String, Object> updates,

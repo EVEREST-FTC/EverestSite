@@ -5,6 +5,9 @@ import com.everest.site.domain.dto.stem.projects.ProjectRequest;
 import com.everest.site.domain.dto.stem.projects.ProjectResponse;
 import com.everest.site.domain.entity.auth.User;
 import com.everest.site.domain.entity.project.Project;
+import com.everest.site.domain.exception.auth.EmailNotFound;
+import com.everest.site.domain.exception.stem.project.ExistentProject;
+import com.everest.site.domain.exception.stem.project.ProjectNotFound;
 import com.everest.site.infra.auth.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,17 +28,14 @@ public class ProjectService {
     @Transactional
     public Optional<ProjectResponse> updateProject(String projectName, ProjectRequest projectDTO, User user) {
         Optional<Project> optionalProject = user.getProjects().stream().filter(project1 -> project1.getName().equals(projectName)).findFirst();
-        if(optionalProject.isEmpty()) return Optional.empty();
+        if(optionalProject.isEmpty()) throw new ProjectNotFound(user.getUsername(), projectName);
         Project project = optionalProject.get();
         user.deleteProject(project);
 
         return addProject(projectDTO, user);
     }
     public Set<ProjectRequest> findAll(String email) {
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        //lançar exceção para "nçao achou o email dentro do repositorio"
-        if (userOptional.isEmpty()) return null;
-        User user = userOptional.get();
+        User user = findUser(email);
         Set<Project> projects = user.getProjects();
         return projects.stream()
                 .map(project ->
@@ -86,35 +86,22 @@ public class ProjectService {
                 .reachedPeople(projectDTO.reachedPeople())
                 .build();
         if (user.getProjects().contains(project))
-            //projeto existente
-            return Optional.empty();
+            throw new ExistentProject(projectDTO.name());
         user.addProject(project);
         userRepository.save(user);
         return Optional.of(project);
     }
 
-    public boolean deleteProject(String projectName, String authenticatedEmail) {
-        Optional<User> userOptional = userRepository.findByEmail(authenticatedEmail);
-        if (userOptional.isEmpty()) return false;//user not found throw exception
-        User user = userOptional.get();
-        Optional<Project> project = searchProject(user, projectName);
-        if (project.isEmpty()) return false;//throw expection> project not found
-        Project projectValue = project.get();
+    public void deleteProject(String projectName, String authenticatedEmail) {
+        User user = findUser(authenticatedEmail);
+        Project projectValue = assertProject(projectName, authenticatedEmail);
         user.deleteProject(projectValue);//projeto deletado
         userRepository.save(user);
-        return true;
     }
 
     @Transactional
     public void updatePatch(String authenticatedEmail, String projectName, Map<String, Object> fields){
-        Optional<User> userOptional = userRepository.findByEmail(authenticatedEmail);
-        //lançar exceção
-        if(userOptional.isEmpty()) return;
-        User user = userOptional.get();
-        Optional<Project> project = searchProject(user, projectName);
-        //lançar exceção
-        if(project.isEmpty()) return;
-        Project projectValue = project.get();
+        Project projectValue = assertProject(authenticatedEmail, projectName);
         merge(fields, projectValue);
     }
 
@@ -130,5 +117,17 @@ public class ProjectService {
         return user.getProjects().stream()
                 .filter(project1 -> project1.getName().equals(projectName))
                 .findFirst();
+    }
+
+    private User findUser(String authenticatedEmail){
+        Optional<User> userOptional = userRepository.findByEmail(authenticatedEmail);
+        if (userOptional.isEmpty()) throw new  EmailNotFound(authenticatedEmail);
+        return userOptional.get();
+    }
+    private Project assertProject(String authenticatedEmail, String projectName){
+        User user = findUser(authenticatedEmail);
+        Optional<Project> project = searchProject(user, projectName);
+        if (project.isEmpty()) throw new ProjectNotFound(user.getUsername(), projectName);
+        return project.get();
     }
 }

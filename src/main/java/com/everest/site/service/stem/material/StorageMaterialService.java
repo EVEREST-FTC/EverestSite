@@ -1,6 +1,7 @@
 package com.everest.site.service.stem.material;
 
 import com.everest.site.domain.dto.stem.material.MaterialResponse;
+import com.everest.site.domain.exception.stem.material.InvalidMaterialType;
 import com.everest.site.infra.ports.StoragePort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,7 +31,7 @@ public class StorageMaterialService {
     public MaterialResponse uploadMaterial(MultipartFile file, String userName) throws IOException {
 
         if(!REQUIRED_CONTENT_TYPE.equals(file.getContentType()))
-            throw new IllegalArgumentException("Invalid file type");
+            throw new InvalidMaterialType(file.getContentType());
 
         String uniqueFileName = generateUniqueFileName(file.getOriginalFilename());
         byte[] fileBytes = file.getBytes();
@@ -50,5 +51,9 @@ public class StorageMaterialService {
         return UUID.randomUUID() + extension;
     }
 
+
+    public void downloadMaterial(String fileKey){
+        storagePort.downloadFile(fileKey);
+    }
 
 }

@@ -27,13 +27,15 @@ public class UserMaterialController {
     public ResponseEntity<String> getURL(@RequestParam("key")String fileKey){
         try {
             String presignedUrl = storageMaterialService.getPresignedURL(fileKey);
-
-            // Retornamos a URL para o cliente
             return ResponseEntity.ok(presignedUrl);
         } catch (Exception e) {
-            // Em um sistema real, você verificaria se a chave S3 existe (404)
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Falha ao gerar o link de download: " + e.getMessage());
         }
+    }
+    @GetMapping("/{filekey}/download")
+    public ResponseEntity<Void> getDownloadURL(@RequestParam("key")String fileKey){
+        storageMaterialService.downloadMaterial(fileKey);
+        return ResponseEntity.ok().build();
     }
 }

@@ -7,6 +7,9 @@ import com.everest.site.domain.dto.users.RegisterRequest;
 import com.everest.site.domain.dto.users.RegisterResponse;
 import com.everest.site.domain.entity.auth.User;
 import com.everest.site.domain.entity.auth.roles.Role;
+import com.everest.site.domain.exception.admin.intrinsics.UnalteredRoleException;
+import com.everest.site.domain.exception.auth.EmailNotFound;
+import com.everest.site.domain.exception.auth.WrongPassword;
 import com.everest.site.infra.auth.UserRepository;
 import com.everest.site.infra.security.TokenService;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +27,11 @@ public class AuthenticationService {
 
     public Optional<LoginResponse> login(LoginRequest login) {
         User user = this.userRepository.findByEmail(login.email())
-                .orElseThrow(()->new RuntimeException("User not found"));
+                .orElseThrow(
+                        ()->new EmailNotFound(login.email()
+                        ));
         if(!passwordEncoder.matches(login.password(), user.getPassword()))
-            return  Optional.empty();
+            throw new WrongPassword();
 
         String token = tokenService.generateToken(user);
 
@@ -35,7 +40,7 @@ public class AuthenticationService {
     public Optional<RegisterResponse> register(RegisterRequest register, Role role) {
         Optional<User> verifyUser = this.userRepository.findByEmail(register.email());
         if(verifyUser.isPresent())
-            return Optional.empty();
+            throw new EmailNotFound(register.email());
         return Optional.of(buildUser(register, role));
     }
 
@@ -62,7 +67,7 @@ public class AuthenticationService {
         User user = verifyUser.get();
         //retorna nada se o usuário já é manager
         if(!updateRole(user, Role.MANAGER))
-            return Optional.empty();
+            throw new UnalteredRoleException(register.name());
 
 
         String newToken = tokenService.generateToken(user);
