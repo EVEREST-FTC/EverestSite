@@ -2,15 +2,16 @@ package com.everest.site.controller.STEM.material;
 
 import com.everest.site.service.stem.material.StorageMaterialService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RequestMapping("/stem/material/user")
 @RestController
@@ -24,18 +25,14 @@ public class UserMaterialController {
         return ResponseEntity.ok(storageMaterialService.listMaterials());
     }
     @GetMapping("/{filekey}")
-    public ResponseEntity<String> getURL(@RequestParam("key")String fileKey){
+    public ResponseEntity<
+            Map.Entry<String, String>> getURL(@PathVariable("filekey")String fileKey){
         try {
-            String presignedUrl = storageMaterialService.getPresignedURL(fileKey);
+            Map.Entry<String, String> presignedUrl = storageMaterialService.getPresignedURL(fileKey);
             return ResponseEntity.ok(presignedUrl);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Falha ao gerar o link de download: " + e.getMessage());
+                    .build();
         }
-    }
-    @GetMapping("/{filekey}/download")
-    public ResponseEntity<Void> getDownloadURL(@RequestParam("key")String fileKey){
-        storageMaterialService.downloadMaterial(fileKey);
-        return ResponseEntity.ok().build();
     }
 }

@@ -4,11 +4,13 @@ import com.everest.site.domain.dto.stem.material.MaterialResponse;
 import com.everest.site.domain.exception.stem.material.InvalidMaterialType;
 import com.everest.site.infra.ports.StoragePort;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -19,7 +21,7 @@ public class StorageMaterialService {
     private static final String DEFAULT_EXTENSION = ".pdf";
 
     
-    public String getPresignedURL(String fileKey){
+    public Map.Entry<String, String> getPresignedURL(String fileKey){
         return  storagePort.getPresignedURL(fileKey);
     }
 
@@ -28,7 +30,7 @@ public class StorageMaterialService {
         return  storagePort.getKeys();
     }
 
-    public MaterialResponse uploadMaterial(MultipartFile file, String userName) throws IOException {
+    public MaterialResponse uploadMaterial(MultipartFile file, String filename) throws IOException {
 
         if(!REQUIRED_CONTENT_TYPE.equals(file.getContentType()))
             throw new InvalidMaterialType(file.getContentType());
@@ -36,9 +38,12 @@ public class StorageMaterialService {
         String uniqueFileName = generateUniqueFileName(file.getOriginalFilename());
         byte[] fileBytes = file.getBytes();
 
-        String url = storagePort.uploadFile(fileBytes, uniqueFileName, "application/pdf");
+        String url = storagePort.uploadFile(fileBytes,
+                uniqueFileName,
+                "application/pdf",
+                filename);
         return new MaterialResponse(url,
-                userName);
+                filename);
     }
 
 
@@ -52,8 +57,8 @@ public class StorageMaterialService {
     }
 
 
-    public void downloadMaterial(String fileKey){
-        storagePort.downloadFile(fileKey);
+    public InputStreamResource downloadMaterial(String fileKey){
+        return storagePort.downloadFile(fileKey);
     }
 
 }

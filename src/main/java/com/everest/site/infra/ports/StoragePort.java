@@ -3,6 +3,7 @@ package com.everest.site.infra.ports;
 import org.springframework.core.io.InputStreamResource;
 
 import java.util.List;
+import java.util.Map;
 
 /// Interface que abstrai as implementações de portas necesárias
 /// para as interações com o http.
@@ -11,9 +12,9 @@ import java.util.List;
 /// os contextos que as demandem.
 /// Para mudar a implementação, basta trocar a anotação Component
 public interface StoragePort<T> {
-    String uploadFile(byte[] file, String fileName, String contentType);
+    String uploadFile(byte[] file, String fileName, String contentType, String description);
 
-    String getPresignedURL(String keyName);
+    Map.Entry<String, String> getPresignedURL(String keyName);
     List<T> getKeys();
     InputStreamResource downloadFile(String fileName);
 }

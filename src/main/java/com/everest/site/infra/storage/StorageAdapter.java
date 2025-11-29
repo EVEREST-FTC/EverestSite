@@ -51,7 +51,10 @@ public class StorageAdapter implements StoragePort<String> {
     }
 
     @Override
-    public String uploadFile(byte[] file, String fileName, String contentType) {
+    public String uploadFile(byte[] file,
+                             String fileName,
+                             String contentType,
+                             String description) {
         //request da aws. É o processo reverso do que fizemos no contorller:
         //esse objeto vai ser seriallizado para o aws e gerará uma
         //resposta acerca da inserção do arquivo.
@@ -62,7 +65,7 @@ public class StorageAdapter implements StoragePort<String> {
                 .key(fileName)
                 //tipo do arquivo. A gente pode salvar qualquer coisa.
                 .contentType(contentType)
-                .metadata(Map.of("filename", fileName))
+                .metadata(Map.of("description", description))
                 .build();
         //regra de arthemis
         //monta o corpo a partir dos dados serializados do arquivo.
@@ -75,20 +78,24 @@ public class StorageAdapter implements StoragePort<String> {
     }
 
     @Override
-    public String getPresignedURL(String keyName) {
+    public Map.Entry<String, String> getPresignedURL(String keyName) {
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
             .bucket(bucketName)
             .key(keyName)
             .build();
 
-        // 2. Cria a requisição de pré-assinatura, definindo a expiração (ex: 5 minutos)
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
                 .getObjectRequest(getObjectRequest)
                 .signatureDuration(Duration.ofMinutes(5)) // Tempo de validade do link
                 .build();
 
+        String description = String.valueOf(getObjectRequest.getValueForField("description", String.class));
+
         // 3. Gera e retorna a URL
-        return s3Presigner.presignGetObject(presignRequest).url().toExternalForm();
+        return Map.entry(
+                description,
+                s3Presigner.presignGetObject(presignRequest).url().toExternalForm()
+        );
     }
 
     @Override
@@ -108,7 +115,6 @@ public class StorageAdapter implements StoragePort<String> {
                 .bucket(bucketName)
                 .key(fileName)
                 .build();
-
         InputStream inputStream = s3Client.getObject(getObjectRequest);
         return new InputStreamResource(inputStream);
     }
