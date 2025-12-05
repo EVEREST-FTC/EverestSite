@@ -65,7 +65,7 @@ metas e outras funcionalidades analíticas que podem ser implementadas no futuro
 
 | Endpoint                                 | Descrição |
 |:-----------------------------------------| :--- |
-       | <span style="color: green;">/stem/material/management</span> | Realiza o upload de um PDF de STEM para o AWS S3. |
+| <span style="color: green;">/stem/material/management</span> | Realiza o upload de um PDF de STEM para o AWS S3. |
 
 #### Leitura de Materiais (Permissão: U)
 | Endpoint                                                        | Descrição |
