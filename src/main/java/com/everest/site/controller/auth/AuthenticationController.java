@@ -16,8 +16,6 @@ import java.util.Optional;
 @RequestMapping("/auth/user")
 @RequiredArgsConstructor
 public class AuthenticationController{
-
-
     private final AuthenticationService authenticationService;
 
     @PostMapping("/login")
