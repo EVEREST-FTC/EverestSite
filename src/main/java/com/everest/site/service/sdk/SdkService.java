@@ -70,7 +70,7 @@ public class SdkService {
             if (!resource.isReadable()) continue;
             String uriString = resource.getURI().toString();
             int startIndex = uriString.indexOf(TEMPLATE_BASE_PATH);
-            if (startIndex == -1) continue; // Deve ser ignorado, mas por segurança
+            if (startIndex == -1) continue;
             String relativePath = uriString.substring(startIndex);
 
             Path targetPath = destinationDir.resolve(relativePath);

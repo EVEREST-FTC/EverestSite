@@ -69,7 +69,6 @@ public class ProjectService {
         //projeto adicionado
         Optional<Project> savedProject = buildProject(projectDTO, user);
         if(savedProject.isEmpty()) return Optional.empty();
-        System.out.println("Chegou aqui 3");
         //chave, descrição
         Project project = savedProject.get();
         return Optional.of(new ProjectResponse(
@@ -94,7 +93,7 @@ public class ProjectService {
 
     public void deleteProject(String projectName, String authenticatedEmail) {
         User user = findUser(authenticatedEmail);
-        Project projectValue = assertProject(projectName, authenticatedEmail);
+        Project projectValue = assertProject(authenticatedEmail, projectName);
         user.deleteProject(projectValue);//projeto deletado
         userRepository.save(user);
     }
