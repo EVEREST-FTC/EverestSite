@@ -1,7 +1,9 @@
 package com.everest.site.domain.dto.stem.projects;
 
-public record ProjectRequest(Integer reachedPeople,
-                             Integer km,
-                             String name,
-                             String description) {
+import java.time.LocalDate;
+
+public record ProjectRequest(
+        String title,
+        String goal,
+        LocalDate deadline) {
 }

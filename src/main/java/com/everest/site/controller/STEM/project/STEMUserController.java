@@ -22,9 +22,9 @@ public class STEMUserController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('user::read')")
-    public ResponseEntity<Set<ProjectRequest>> getProjects(@AuthenticationPrincipal User user) {
+    public ResponseEntity<Set<ProjectResponse>> getProjects(@AuthenticationPrincipal User user) {
         String userEmail = user.getEmail();
-        Set<ProjectRequest> projects = projectService.findAll(userEmail);
+        Set<ProjectResponse> projects = projectService.findAll(userEmail);
         return ResponseEntity.ok(projects);
     }
 

@@ -1,6 +1,7 @@
 package com.everest.site.controller.STEM.project;
 
 import com.everest.site.domain.dto.stem.projects.ProjectRequest;
+import com.everest.site.domain.dto.stem.projects.ProjectResponse;
 import com.everest.site.service.stem.project.ProjectService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class STEMAdminController {
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<Set<ProjectRequest>> getUserProjects(@PathVariable("userId") String userId) {
+    public ResponseEntity<Set<ProjectResponse>> getUserProjects(@PathVariable("userId") String userId) {
 
        return ResponseEntity.ok(projectService.findAll(userId));
 

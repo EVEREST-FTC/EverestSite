@@ -27,23 +27,22 @@ public class ProjectService {
     private final UserRepository userRepository;
     @Transactional
     public Optional<ProjectResponse> updateProject(String projectName, ProjectRequest projectDTO, User user) {
-        Optional<Project> optionalProject = user.getProjects().stream().filter(project1 -> project1.getName().equals(projectName)).findFirst();
+        Optional<Project> optionalProject = user.getProjects().stream().filter(project1 -> project1.getTitle().equals(projectName)).findFirst();
         if(optionalProject.isEmpty()) throw new ProjectNotFound(user.getUsername(), projectName);
         Project project = optionalProject.get();
         user.deleteProject(project);
 
         return addProject(projectDTO, user);
     }
-    public Set<ProjectRequest> findAll(String email) {
+    public Set<ProjectResponse> findAll(String email) {
         User user = findUser(email);
         Set<Project> projects = user.getProjects();
         return projects.stream()
                 .map(project ->
-                        new ProjectRequest(
-                                project.getReachedPeople(),
-                                project.getKm(),
-                                project.getName(),
-                                project.getDescription()
+                        new ProjectResponse(
+                                project.getTitle(),
+                                project.getGoal(),
+                                project.getDeadline()
                         )
                 )
                 .collect(Collectors.toSet());
@@ -56,10 +55,9 @@ public class ProjectService {
                 .flatMap(Set::stream)
                 .map(project ->
                         new ProjectRequest(
-                                project.getReachedPeople(),
-                                project.getKm(),
-                                project.getName(),
-                                project.getDescription()
+                                project.getTitle(),
+                                project.getGoal(),
+                                project.getDeadline()
                         )
                 )
                 .collect(Collectors.toSet());
@@ -72,20 +70,20 @@ public class ProjectService {
         //chave, descrição
         Project project = savedProject.get();
         return Optional.of(new ProjectResponse(
-                project.getName(),
-                project.getDescription()
+                project.getTitle(),
+                project.getGoal(),
+                project.getDeadline()
         ));
     }
 
     public Optional<Project> buildProject(ProjectRequest projectDTO, User user) {
         Project project = Project.builder()
-                .km(projectDTO.km())
-                .description(projectDTO.description())
-                .name(projectDTO.name())
-                .reachedPeople(projectDTO.reachedPeople())
+                .deadline(projectDTO.deadline())
+                .title(projectDTO.title())
+                .goal(projectDTO.goal())
                 .build();
         if (user.getProjects().contains(project))
-            throw new ExistentProject(projectDTO.name());
+            throw new ExistentProject(projectDTO.title());
         user.addProject(project);
         userRepository.save(user);
         return Optional.of(project);
@@ -114,7 +112,7 @@ public class ProjectService {
 
     private Optional<Project> searchProject(User user, String projectName) {
         return user.getProjects().stream()
-                .filter(project1 -> project1.getName().equals(projectName))
+                .filter(project1 -> project1.getTitle().equals(projectName))
                 .findFirst();
     }
 

@@ -9,6 +9,7 @@ import com.everest.site.domain.entity.auth.User;
 import com.everest.site.domain.entity.auth.roles.Role;
 import com.everest.site.domain.exception.admin.intrinsics.UnalteredRoleException;
 import com.everest.site.domain.exception.auth.EmailNotFound;
+import com.everest.site.domain.exception.auth.ExistentUser;
 import com.everest.site.domain.exception.auth.WrongPassword;
 import com.everest.site.infra.auth.UserRepository;
 import com.everest.site.infra.security.TokenService;
@@ -40,7 +41,7 @@ public class AuthenticationService {
     public Optional<RegisterResponse> register(RegisterRequest register, Role role) {
         Optional<User> verifyUser = this.userRepository.findByEmail(register.email());
         if(verifyUser.isPresent())
-            throw new EmailNotFound(register.email());
+            throw new ExistentUser(register.email());
         return Optional.of(buildUser(register, role));
     }
 
