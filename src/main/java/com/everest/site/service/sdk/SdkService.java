@@ -1,7 +1,15 @@
 package com.everest.site.service.sdk;
 
 import com.everest.site.domain.dto.sdk.SdkGen;
+import com.everest.site.domain.dto.sdk.SdkResponse;
+import com.everest.site.domain.dto.stem.projects.ProjectRequest;
+import com.everest.site.domain.dto.stem.projects.ProjectResponse;
+import com.everest.site.domain.entity.auth.User;
+import com.everest.site.domain.entity.project.Project;
 import com.everest.site.domain.entity.sdk.Dependency;
+import com.everest.site.domain.entity.sdk.Sdk;
+import com.everest.site.domain.exception.stem.project.ExistentProject;
+import com.everest.site.infra.auth.UserRepository;
 import com.everest.site.infra.ports.StoragePort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -21,6 +29,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -29,6 +38,7 @@ import java.util.zip.ZipOutputStream;
 public class SdkService {
     private final ResourcePatternResolver resourceResolver;
     private final StoragePort<String> storagePort;
+    private final UserRepository userRepository;
     private static final String TEMPLATE_BASE_PATH = "FtcRobotController-master/";
     private static final String DEPENDENCY_FILE_NAME = "build.dependencies.gradle";
 
@@ -121,4 +131,28 @@ public class SdkService {
         }
         return bos;
     }
+    public Optional<SdkResponse> addToUser(SdkGen sdkGen, User user){
+        Optional<Sdk> savedSDK = buildProject(sdkGen, user);
+        Optional<String> link = buildProjectToAWS(sdkGen);
+        if(savedSDK.isEmpty()||link.isEmpty()) return Optional.empty();
+        //chave, descrição
+        Sdk sdk = savedSDK.get();
+        return Optional.of(new SdkResponse(
+                sdk.getTitle(),
+                sdk.getDescription(),
+                link.get()
+        ));
+    }
+    public Optional<Sdk> buildProject(SdkGen sdkDTO, User user) {
+        Sdk sdk = Sdk.builder()
+                .description(sdkDTO.description())
+                .title(sdkDTO.projectName())
+                .build();
+        if (user.getSdks().contains(sdk))
+            throw new ExistentProject(sdk.getTitle());
+        user.addSDK(sdk);
+        userRepository.save(user);
+        return Optional.of(sdk);
+    }
+
 }

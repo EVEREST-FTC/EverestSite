@@ -58,6 +58,7 @@ public class StorageAdapter implements StoragePort<String> {
         //request da aws. É o processo reverso do que fizemos no contorller:
         //esse objeto vai ser seriallizado para o aws e gerará uma
         //resposta acerca da inserção do arquivo.
+
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 //caminho para colocar o objeto
                 .bucket(bucketName)

@@ -1,7 +1,9 @@
 package com.everest.site.domain.entity.auth;
 
 import com.everest.site.domain.entity.auth.roles.Role;
+import com.everest.site.domain.entity.inventory.InventoryMaterial;
 import com.everest.site.domain.entity.project.Project;
+import com.everest.site.domain.entity.sdk.Sdk;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -36,6 +38,26 @@ public class User implements UserDetails{
     )
     private Set<Project> projects;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "user_sdks",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<Sdk> sdks;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "user_materials",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<InventoryMaterial> materials;
+
+
+    private boolean isActiveInFirst;
+
+
+
+
     public void deleteProject(Project project){
         this.projects.remove(project);
     }
@@ -43,6 +65,8 @@ public class User implements UserDetails{
     public void addProject(Project project){
         this.projects.add(project);
     }
+    public void addSDK(Sdk sdk){ this.sdks.add(sdk);}
+    public void addMaterial(InventoryMaterial material){ this.materials.add(material); }
 
     public void setProject(Project project, Consumer<Project> consumer){
         consumer.accept(project);
@@ -51,5 +75,9 @@ public class User implements UserDetails{
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return role.getAuthorities();
+    }
+
+    public void deleteMaterial(InventoryMaterial material) {
+        this.materials.remove(material);
     }
 }

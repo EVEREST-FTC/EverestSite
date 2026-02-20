@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,6 +54,25 @@ public class AuthenticationController{
         }
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuário não encontrado");
+    }
+
+    @PutMapping
+    @PreAuthorize("hasAuthority('user::write')")
+    public ResponseEntity<RegisterResponse> updateUser(
+            @RequestBody RegisterRequest userDTO,
+            @AuthenticationPrincipal User user
+    ){
+        RegisterResponse updatedUser = authenticationService.updateUser(userDTO, user);
+
+        return ResponseEntity.ok(updatedUser);
+    }
+
+    @PatchMapping
+    @PreAuthorize("hasAuthority('user::write')")
+    public void patchUser(
+            @RequestBody Map<String, Object> updates,
+            @AuthenticationPrincipal User user){
+        authenticationService.patchUser(user, updates);
     }
 }
 

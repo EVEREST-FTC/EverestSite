@@ -4,5 +4,5 @@ import com.everest.site.domain.entity.sdk.Dependency;
 
 import java.util.List;
 
-public record SdkGen(String projectName, List<Dependency> dependencies) {
+public record SdkGen(String projectName, String description, List<Dependency> dependencies) {
 }

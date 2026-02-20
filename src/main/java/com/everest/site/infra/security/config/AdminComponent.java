@@ -20,7 +20,7 @@ public class AdminComponent {
     public CommandLineRunner initAdmin(AuthenticationService authentication) {
         return args ->
                 authentication.register(
-                        new RegisterRequest("admin", adminEmail, adminPassword),
+                        new RegisterRequest("admin", adminEmail, adminPassword, true),
                         Role.ADMIN
                 );
 
