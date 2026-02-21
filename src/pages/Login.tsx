@@ -4,15 +4,41 @@ import { Eye, EyeOff, Lock, User, Terminal, ArrowRight, ShieldAlert } from "luci
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import {  api } from "@/services/api";
 
 const Login = () => {
+  const navigate = useNavigate(); // Hook de navegação
+
+  const [email, setLogin] = useState(""); 
+  const [password, setPassword] = useState("");
+
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 2000);
+
+    try {
+      // A estrutura do body { login, password } deve bater com seu DTO Java
+      const response = await api.post("/auth/user/login", { 
+        email: email, 
+        password: password 
+      });
+
+      const { token } = response.data;
+
+      localStorage.setItem("token", token);
+
+      navigate("/"); 
+      
+    } catch (error) {
+      console.error("Erro no login:", error);
+      localStorage.removeItem('token')
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -94,6 +120,8 @@ const Login = () => {
                 <input 
                   type="email" 
                   id="email"
+                  value={email}
+                  onChange={(e) => setLogin(e.target.value)}
                   className="w-full bg-[#F0F0F0] border-4 border-black rounded-lg p-3 pl-4 font-mono text-sm focus:outline-none focus:bg-white focus:shadow-[4px_4px_0px_0px_#000] transition-all placeholder:text-gray-400"
                   placeholder="piloto@everest.com"
                   required
@@ -115,6 +143,8 @@ const Login = () => {
                 <input 
                   type={showPassword ? "text" : "password"} 
                   id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-[#F0F0F0] border-4 border-black rounded-lg p-3 pl-4 pr-12 font-mono text-sm focus:outline-none focus:bg-white focus:shadow-[4px_4px_0px_0px_#000] transition-all placeholder:text-gray-400"
                   placeholder="••••••••"
                   required

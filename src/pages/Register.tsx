@@ -5,17 +5,65 @@ import {
   Cpu, ShieldCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Label } from "@/components/ui/label";
-
+import { useToast } from "@/hooks/use-toast";
+import { api } from "@/services/api";
 const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const handleRegister = (e: React.FormEvent) => {
+  // 1. Estado para os dados do formulário
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: ""
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // 2. Validação básica de senha no front
+    if (formData.password !== formData.confirmPassword) {
+      return toast({
+        variant: "destructive",
+        title: "Erro de senha",
+        description: "As senhas não coincidem!"
+      });
+    }
+
     setIsLoading(true);
-    // Simula envio
-    setTimeout(() => setIsLoading(false), 2000);
+
+    try {
+      await api.post("/auth/user/register", {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password
+      });
+
+      toast({
+        title: "Recruta Registrado!",
+        description: "Agora você pode acessar o centro de comando.",
+      });
+
+      navigate("/login");
+      
+    } catch (error: any) {
+      console.error("Erro ao registrar:", error);
+      toast({
+        variant: "destructive",
+        title: "Falha no recrutamento",
+        description: error.response?.data?.message || "Erro ao conectar com o servidor."
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -86,6 +134,9 @@ const Register = () => {
               </Label>
               <input 
                 type="text" 
+                name="name" // Essencial para o handleInputChange funcionar
+                value={formData.name} // Conecta ao estado
+                onChange={handleInputChange} // Atualiza o estado ao digitar
                 className="w-full bg-[#F0F0F0] border-4 border-black rounded-lg p-3 font-mono text-sm focus:outline-none focus:bg-[#E8F5E9] focus:shadow-[4px_4px_0px_0px_#000] transition-all placeholder:text-gray-400"
                 placeholder="Ex: João Silva"
                 required
@@ -99,6 +150,9 @@ const Register = () => {
               </Label>
               <input 
                 type="email" 
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
                 className="w-full bg-[#F0F0F0] border-4 border-black rounded-lg p-3 font-mono text-sm focus:outline-none focus:bg-[#E8F5E9] focus:shadow-[4px_4px_0px_0px_#000] transition-all placeholder:text-gray-400"
                 placeholder="nome@escola.com"
                 required
@@ -113,6 +167,9 @@ const Register = () => {
                 </Label>
                 <input 
                   type="password" 
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
                   className="w-full bg-[#F0F0F0] border-4 border-black rounded-lg p-3 font-mono text-sm focus:outline-none focus:bg-[#E8F5E9] focus:shadow-[4px_4px_0px_0px_#000] transition-all placeholder:text-gray-400"
                   placeholder="******"
                   required
@@ -126,6 +183,9 @@ const Register = () => {
                 </Label>
                 <input 
                   type="password" 
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
                   className="w-full bg-[#F0F0F0] border-4 border-black rounded-lg p-3 font-mono text-sm focus:outline-none focus:bg-[#E8F5E9] focus:shadow-[4px_4px_0px_0px_#000] transition-all placeholder:text-gray-400"
                   placeholder="******"
                   required
