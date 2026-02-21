@@ -1,111 +1,114 @@
 package com.everest.site.service.stem.inventory;
 
-import com.everest.site.domain.dto.stem.material.MaterialResponse;
-import com.everest.site.domain.dto.stem.projects.InventoryRequest;
-import com.everest.site.domain.dto.stem.projects.InventoryResponse;
+import com.everest.site.domain.dto.stem.projects.NotebookRequest;
+import com.everest.site.domain.dto.stem.projects.NotebookResponse;
 import com.everest.site.domain.entity.auth.User;
-import com.everest.site.domain.entity.inventory.InventoryMaterial;
+import com.everest.site.domain.entity.notebook.Notebook;
 import com.everest.site.domain.exception.auth.EmailNotFound;
 import com.everest.site.infra.auth.UserRepository;
-import com.everest.site.infra.ports.StoragePort;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class InventoryMaterialService {
 
     private final UserRepository userRepository;
     @Transactional
-    public Optional<InventoryResponse> updateMaterial(String materialName, InventoryRequest materialDTO, User user) {
-        Optional<InventoryMaterial> optionalMaterial = user.getMaterials().stream().filter(project1 -> project1.getName().equals(materialName)).findFirst();
-        if(optionalMaterial.isEmpty()) return Optional.empty();
-        InventoryMaterial material = optionalMaterial.get();
-        user.deleteMaterial(material);
+    public Optional<NotebookResponse> updateNotebook(String notebookId, NotebookRequest notebookDTO, User user) {
+        // Fetch managed user first
+        User managedUser = findUser(user.getEmail());
 
-        return addMaterial(materialDTO, user);
+        Optional<Notebook> optionalMaterial = managedUser.getNotebookEntries().stream()
+                .filter(project1 -> project1.getId().equals(notebookId))
+                .findFirst();
+
+        if(optionalMaterial.isEmpty()) return Optional.empty();
+
+        Notebook material = optionalMaterial.get();
+        managedUser.deleteNotebook(material);
+
+        return addNotebook(notebookDTO, managedUser);
     }
-    public Set<InventoryResponse> findAll(String email) {
+    public Set<NotebookResponse> findAll(String email) {
         User user = findUser(email);
-        Set<InventoryMaterial> material = user.getMaterials();
-        return material.stream()
-                .map(m ->
-                        new InventoryResponse(
-                                m.getName(),
-                                m.getQuantity()
-                        )
-                )
+        Set<Notebook> notebooks = user.getNotebookEntries();
+        return notebooks.stream()
+                .map(NotebookResponse::fromEntity)
                 .collect(Collectors.toSet());
     }
 
-    public Set<InventoryResponse> findAll() {
+    public Set<NotebookResponse> findAll() {
         List<User> users = userRepository.findAll();
         return users.stream()
-                .map(User::getMaterials)
+                .map(User::getNotebookEntries)
                 .flatMap(Set::stream)
-                .map(project ->
-                        new InventoryResponse(
-                                project.getName(),
-                                project.getQuantity()
-                        )
-                )
+                .map(NotebookResponse::fromEntity)
                 .collect(Collectors.toSet());
     }
 
-    public Optional<InventoryResponse> addMaterial(InventoryRequest projectDTO, User user) {
-        //projeto adicionado
-        Optional<InventoryMaterial> savedMaterial = buildMaterial(projectDTO, user);
+
+    public Optional<NotebookResponse> addNotebook(NotebookRequest projectDTO, User user) {
+        User managedUser = findUser(user.getEmail());
+
+        // 2. Pass the MANAGED user to the builder
+        Optional<Notebook> savedMaterial = buildNotebook(projectDTO, managedUser);
+
         if(savedMaterial.isEmpty()) return Optional.empty();
-        //chave, descrição
-        InventoryMaterial project = savedMaterial.get();
-        return Optional.of(new InventoryResponse(
-                projectDTO.name(),
-                projectDTO.quantity()
-        ));
+
+        Notebook notebook = savedMaterial.get();
+        return Optional.of(NotebookResponse.fromEntity(notebook));
     }
 
-    public Optional<InventoryMaterial> buildMaterial(InventoryRequest materialDTO, User user) {
-        InventoryMaterial material = new InventoryMaterial(materialDTO.name(), materialDTO.quantity());
-        if (user.getMaterials().contains(material))
+    public Optional<Notebook> buildNotebook(NotebookRequest request, User user) {
+        Notebook entry = Notebook.builder()
+                .id(UUID.randomUUID().toString()) // Unique handle for the UI
+                .date(request.date())
+                .tag(request.tag())
+                .content(request.content())
+                .author(request.author())
+                .build();
+
+        // This now checks if the user ALREADY has a note with this date, tag, and content
+        if (user.getNotebookEntries().contains(entry)) {
             return Optional.empty();
-        user.addMaterial(material);
+        }
+
+        user.addNotebook(entry);
         userRepository.save(user);
-        return Optional.of(material);
+        return Optional.of(entry);
     }
 
-    public void deleteMaterial(String materialName, String authenticatedEmail) {
+    public void deleteNotebook(String notebookId, String authenticatedEmail) {
         User user = findUser(authenticatedEmail);
-        InventoryMaterial materialValue = assertMaterial(authenticatedEmail, materialName);
-        user.deleteMaterial(materialValue);//projeto deletado
+        Notebook notebook = assertNotebook(authenticatedEmail, notebookId);
+        user.deleteNotebook(notebook);//projeto deletado
         userRepository.save(user);
     }
 
-    @Transactional
     public void updatePatch(String authenticatedEmail, String projectName, Map<String, Object> fields){
-        InventoryMaterial projectValue = assertMaterial(authenticatedEmail, projectName);
+        Notebook projectValue = assertNotebook(authenticatedEmail, projectName);
         merge(fields, projectValue);
     }
 
-    private void merge(Map<String, Object> fields, InventoryMaterial project) {
+    private void merge(Map<String, Object> fields, Notebook project) {
         fields.forEach((key, value) -> {
-            Field field = ReflectionUtils.findField(InventoryMaterial.class, key);
+            Field field = ReflectionUtils.findField(Notebook.class, key);
             field.setAccessible(true);
             ReflectionUtils.setField(field, project, value);
         });
     }
 
-    private Optional<InventoryMaterial> searchMaterial(User user, String projectName) {
-        return user.getMaterials().stream()
-                .filter(project1 -> project1.getName().equals(projectName))
+    private Optional<Notebook> searchNotebook(User user, String projectId) {
+        return user.getNotebookEntries().stream()
+                .filter(project1 -> project1.getId().equals(projectId))
                 .findFirst();
     }
 
@@ -114,17 +117,11 @@ public class InventoryMaterialService {
         if (userOptional.isEmpty()) throw new EmailNotFound(authenticatedEmail);
         return userOptional.get();
     }
-    private InventoryMaterial assertMaterial(String authenticatedEmail, String projectName){
+    private Notebook assertNotebook(String authenticatedEmail, String projectName){
         User user = findUser(authenticatedEmail);
-        Optional<InventoryMaterial> project = searchMaterial(user, projectName);
+        Optional<Notebook> project = searchNotebook(user, projectName);
         if (project.isEmpty()) throw new RuntimeException(user.getUsername());
         return project.get();
     }
 
-    public List<InventoryResponse> searchByName(String name){
-        return userRepository.findByNameContainingIgnoreCase(name)
-                .stream()
-                .map(InventoryResponse::fromEntity)
-                .toList();
-    }
 }

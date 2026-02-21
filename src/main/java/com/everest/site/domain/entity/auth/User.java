@@ -1,7 +1,7 @@
 package com.everest.site.domain.entity.auth;
 
 import com.everest.site.domain.entity.auth.roles.Role;
-import com.everest.site.domain.entity.inventory.InventoryMaterial;
+import com.everest.site.domain.entity.notebook.Notebook;
 import com.everest.site.domain.entity.project.Project;
 import com.everest.site.domain.entity.sdk.Sdk;
 import jakarta.persistence.*;
@@ -10,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -45,12 +46,12 @@ public class User implements UserDetails{
     )
     private Set<Sdk> sdks;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection
     @CollectionTable(
-            name = "user_materials",
+            name = "user_notebook_entries",
             joinColumns = @JoinColumn(name = "user_id")
     )
-    private Set<InventoryMaterial> materials;
+    private Set<Notebook> notebookEntries = new HashSet<>();
 
 
     private boolean isActiveInFirst;
@@ -66,7 +67,7 @@ public class User implements UserDetails{
         this.projects.add(project);
     }
     public void addSDK(Sdk sdk){ this.sdks.add(sdk);}
-    public void addMaterial(InventoryMaterial material){ this.materials.add(material); }
+    public void addNotebook(Notebook notebook){ this.notebookEntries.add(notebook); }
 
     public void setProject(Project project, Consumer<Project> consumer){
         consumer.accept(project);
@@ -77,7 +78,7 @@ public class User implements UserDetails{
         return role.getAuthorities();
     }
 
-    public void deleteMaterial(InventoryMaterial material) {
-        this.materials.remove(material);
+    public void deleteNotebook(Notebook material) {
+        this.notebookEntries.remove(material);
     }
 }
